@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud-Based Canteen Pre-Order System</title>
+    <!-- Google Fonts: Outfit for headings, Inter for body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for beautiful icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Firebase Compat SDKs (Beginner friendly & easy to explain in Viva) -->
+    <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <!-- Main Script -->
+    <script defer src="script.js"></script>
+</head>
+<body>
+
+    <!-- Notification Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo" id="nav-logo-btn">
+                <i class="fa-solid fa-utensils logo-icon"></i>
+                <span class="logo-text">Cloud<span class="logo-highlight">Canteen</span></span>
+            </a>
+            
+            <nav class="nav-links" id="nav-menu">
+                <a href="#" class="nav-link active" data-view="home-view">Home</a>
+                <a href="#" class="nav-link" data-view="menu-view">Menu</a>
+                <a href="#" class="nav-link student-only hidden" data-view="orders-view">My Orders</a>
+                <a href="#" class="nav-link admin-only hidden" data-view="admin-view">Admin Dashboard</a>
+            </nav>
+
+            <div class="nav-actions">
+                <!-- Shopping Cart Trigger -->
+                <button class="cart-btn" id="cart-toggle-btn" aria-label="Open Cart">
+                    <i class="fa-solid fa-basket-shopping"></i>
+                    <span class="cart-badge" id="cart-count">0</span>
+                </button>
+
+                <!-- Auth Buttons -->
+                <div class="auth-buttons-container">
+                    <button class="btn btn-outline" id="login-nav-btn">Login</button>
+                    <button class="btn btn-primary" id="register-nav-btn">Register</button>
+                    
+                    <!-- Logged In User Profile Dropdown / Log out -->
+                    <div class="user-profile hidden" id="user-profile-menu">
+                        <span class="user-welcome"><i class="fa-regular fa-circle-user"></i> <span id="user-display-name">Student</span></span>
+                        <button class="logout-btn" id="logout-btn" title="Logout"><i class="fa-solid fa-power-off"></i></button>
+                    </div>
+                </div>
+                
+                <!-- Mobile Navigation Toggle -->
+                <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle Navigation">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+        <!-- 1. Home View -->
+        <section id="home-view" class="view-section active">
+            <div class="hero-section">
+                <div class="hero-content">
+                    <span class="hero-tag">Smart Canteen Solution</span>
+                    <h1 class="hero-title">Order Food in Advance.<br><span class="highlight">Skip the Queue.</span></h1>
+                    <p class="hero-subtitle">Pre-order delicious, fresh canteen meals directly from your phone. Track preparing status in real-time and grab your food on time.</p>
+                    <div class="hero-ctas">
+                        <button class="btn btn-primary btn-lg" onclick="switchView('menu-view')">View Menu <i class="fa-solid fa-arrow-right"></i></button>
+                        <button class="btn btn-outline-light btn-lg btn-intro-learn" onclick="document.getElementById('features-section').scrollIntoView({ behavior: 'smooth' })">Learn More</button>
+                    </div>
+                </div>
+                <div class="hero-illustration">
+                    <div class="hero-img-backdrop"></div>
+                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=600&auto=format&fit=crop" alt="Delicious Food Bowl" class="hero-food-img">
+                    <div class="hero-floating-card card-1">
+                        <i class="fa-solid fa-clock-rotate-left card-icon"></i>
+                        <div>
+                            <h4>Instant Prep</h4>
+                            <p>Pre-ordered in 1 click</p>
+                        </div>
+                    </div>
+                    <div class="hero-floating-card card-2">
+                        <i class="fa-solid fa-cloud-arrow-up card-icon"></i>
+                        <div>
+                            <h4>Cloud Connected</h4>
+                            <p>Real-time updates</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features & Info -->
+            <div class="features-container" id="features-section">
+                <div class="section-header text-center">
+                    <h2 class="section-title">Why Use Pre-Ordering?</h2>
+                    <p class="section-subtitle">A modern solution addressing long canteen queues and waiting times.</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper orange">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <h3>Save Valuable Time</h3>
+                        <p>No more standing in lines during short class intervals. Order beforehand, pick up instantly.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper green">
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+                        </div>
+                        <h3>Cashless & Easy</h3>
+                        <p>Track your subtotals and check out transparently. No hassles of carrying cash change.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper purple">
+                            <i class="fa-solid fa-bell"></i>
+                        </div>
+                        <h3>Real-time Tracking</h3>
+                        <p>Watch your order status transition from Preparing to Ready for Pickup live on your device.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Details / Cloud Computing Student Info -->
+            <div class="project-info-container">
+                <div class="project-info-card">
+                    <div class="badge-computing"><i class="fa-solid fa-cloud"></i> CSE Mini Project</div>
+                    <h3>Cloud Computing Concepts Demonstrated</h3>
+                    <p>This mini-project demonstrates serverless cloud database integration and live updates. The cloud components include:</p>
+                    <ul class="cloud-features-list">
+                        <li><i class="fa-solid fa-check"></i> <strong>Firebase Authentication:</strong> Secure user accounts and access tokens.</li>
+                        <li><i class="fa-solid fa-check"></i> <strong>Cloud Firestore:</strong> Centralized real-time document storage for orders & menus.</li>
+                        <li><i class="fa-solid fa-check"></i> <strong>Firebase Storage:</strong> Cloud asset storage for food images uploaded by admins.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Menu View -->
+        <section id="menu-view" class="view-section">
+            <div class="view-header">
+                <div>
+                    <h2 class="page-title">Explore Our Canteen Menu</h2>
+                    <p class="page-subtitle">Handpicked fresh meals prepared with high-quality ingredients.</p>
+                </div>
+                <div class="search-filter-wrapper">
+                    <!-- Search Bar -->
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="menu-search-input" placeholder="Search food by name or category...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Pills Navigation -->
+            <div class="category-tabs" id="category-tabs-container">
+                <button class="category-pill active" data-category="all">All Items</button>
+                <button class="category-pill" data-category="Breakfast">Breakfast</button>
+                <button class="category-pill" data-category="Meals">Meals</button>
+                <button class="category-pill" data-category="Snacks">Snacks</button>
+                <button class="category-pill" data-category="Beverages">Beverages</button>
+                <button class="category-pill" data-category="Desserts">Desserts</button>
+                <button class="category-pill" data-category="Other">Other</button>
+            </div>
+
+            <!-- Food Menu Grid -->
+            <div class="food-grid" id="food-menu-grid">
+                <!-- Food cards will load here dynamically via JavaScript -->
+                <div class="loading-state">
+                    <i class="fa-solid fa-spinner fa-spin loading-spinner"></i>
+                    <p>Loading fresh dishes...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Student Orders View -->
+        <section id="orders-view" class="view-section">
+            <div class="view-header">
+                <div>
+                    <h2 class="page-title">My Pre-Orders</h2>
+                    <p class="page-subtitle">Track, monitor, and check history of your canteen orders.</p>
+                </div>
+            </div>
+
+            <!-- Student Dashboard Summary Cards -->
+            <div class="dashboard-stats-grid student-stats">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <span class="stat-label">Total Pre-Orders</span>
+                        <h2 class="stat-val" id="student-stat-total">0</h2>
+                    </div>
+                    <div class="stat-icon bg-orange"><i class="fa-solid fa-box"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <span class="stat-label">Pending / Preparing</span>
+                        <h2 class="stat-val text-yellow" id="student-stat-pending">0</h2>
+                    </div>
+                    <div class="stat-icon bg-yellow"><i class="fa-solid fa-clock"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <span class="stat-label">Completed Orders</span>
+                        <h2 class="stat-val text-green" id="student-stat-completed">0</h2>
+                    </div>
+                    <div class="stat-icon bg-green"><i class="fa-solid fa-circle-check"></i></div>
+                </div>
+            </div>
+
+            <!-- Orders Listing -->
+            <div class="orders-list-wrapper">
+                <h3>Order History & Active Tracking</h3>
+                <div class="table-container">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Items</th>
+                                <th>Total Price</th>
+                                <th>Pickup Time</th>
+                                <th>Order Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-orders-tbody">
+                            <!-- Populated dynamically -->
+                            <tr>
+                                <td colspan="7" class="empty-table-message">
+                                    <i class="fa-regular fa-folder-open"></i>
+                                    <p>No orders found. Go to the menu to place your first pre-order!</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Admin Dashboard View -->
+        <section id="admin-view" class="view-section">
+            <div class="view-header">
+                <div>
+                    <h2 class="page-title">Admin Dashboard</h2>
+                    <p class="page-subtitle">Canteen Pre-Order Management Console (Firestore Real-time Sync)</p>
+                </div>
+            </div>
+
+            <!-- Admin Overall Stats -->
+            <div class="dashboard-stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <span class="stat-label">Total Revenue</span>
+                        <h2 class="stat-val text-green" id="admin-stat-revenue">₹0</h2>
+                    </div>
+                    <div class="stat-icon bg-green"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <span class="stat-label">Total Orders</span>
+                        <h2 class="stat-val" id="admin-stat-total">0</h2>
+                    </div>
+                    <div class="stat-icon bg-orange"><i class="fa-solid fa-list-check"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <span class="stat-label">Pending Orders</span>
+                        <h2 class="stat-val text-yellow" id="admin-stat-pending">0</h2>
+                    </div>
+                    <div class="stat-icon bg-yellow"><i class="fa-regular fa-clock"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <span class="stat-label">Preparing Orders</span>
+                        <h2 class="stat-val text-blue" id="admin-stat-preparing">0</h2>
+                    </div>
+                    <div class="stat-icon bg-blue"><i class="fa-solid fa-fire-burner"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <span class="stat-label">Ready for Pickup</span>
+                        <h2 class="stat-val text-purple" id="admin-stat-ready">0</h2>
+                    </div>
+                    <div class="stat-icon bg-purple"><i class="fa-solid fa-circle-exclamation"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <span class="stat-label">Completed Orders</span>
+                        <h2 class="stat-val text-green" id="admin-stat-completed">0</h2>
+                    </div>
+                    <div class="stat-icon bg-green"><i class="fa-solid fa-circle-check"></i></div>
+                </div>
+            </div>
+
+            <!-- Admin Sub-Navigation (Tabs) -->
+            <div class="admin-tabs">
+                <button class="admin-tab-btn active" id="admin-tab-orders" onclick="switchAdminTab('orders')"><i class="fa-solid fa-receipt"></i> Live Orders</button>
+                <button class="admin-tab-btn" id="admin-tab-menu" onclick="switchAdminTab('menu')"><i class="fa-solid fa-burger"></i> Manage Menu</button>
+            </div>
+
+            <!-- Admin Tab: Live Orders -->
+            <div class="admin-tab-content active" id="admin-orders-content">
+                <div class="admin-section-header">
+                    <h3>Incoming Pre-orders</h3>
+                </div>
+                <div class="table-container">
+                    <table class="orders-table admin-orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Student Details</th>
+                                <th>Items Ordered</th>
+                                <th>Total Price</th>
+                                <th>Pickup Time</th>
+                                <th>Order Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-orders-tbody">
+                            <!-- Populated dynamically -->
+                            <tr>
+                                <td colspan="8" class="empty-table-message">
+                                    <i class="fa-solid fa-inbox"></i>
+                                    <p>No orders placed yet.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Admin Tab: Manage Menu -->
+            <div class="admin-tab-content" id="admin-menu-content">
+                <div class="admin-section-header">
+                    <h3>Menu Management</h3>
+                    <button class="btn btn-primary" id="add-food-btn"><i class="fa-solid fa-plus"></i> Add New Food Item</button>
+                </div>
+                
+                <!-- Admin Food list (Editable Cards / List) -->
+                <div class="admin-food-grid" id="admin-food-grid">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Slide-out Shopping Cart Panel -->
+    <div class="cart-sidebar-overlay" id="cart-overlay"></div>
+    <aside class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-sidebar-header">
+            <h3><i class="fa-solid fa-basket-shopping"></i> Shopping Cart</h3>
+            <button class="close-cart-btn" id="cart-close-btn" aria-label="Close Cart"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <!-- Cart Items List -->
+        <div class="cart-items-container" id="cart-items-container">
+            <!-- Dynamic items loaded here -->
+            <div class="cart-empty-state">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <p>Your cart is empty.</p>
+                <button class="btn btn-outline btn-sm" onclick="closeCart(); switchView('menu-view')">Browse Menu</button>
+            </div>
+        </div>
+
+        <!-- Cart Summary & Checkout Form -->
+        <div class="cart-footer hidden" id="cart-footer">
+            <div class="cart-pricing">
+                <div class="price-row">
+                    <span>Subtotal</span>
+                    <span id="cart-subtotal">₹0</span>
+                </div>
+                <div class="price-row divider">
+                    <span>CGST + SGST (0%)</span>
+                    <span>₹0</span>
+                </div>
+                <div class="price-row total">
+                    <span>Total Amount</span>
+                    <span id="cart-total">₹0</span>
+                </div>
+            </div>
+
+            <!-- Checkout Details Form -->
+            <div class="checkout-form">
+                <label for="pickup-time-select">Select Preferred Pickup Time</label>
+                <div class="select-wrapper">
+                    <select id="pickup-time-select" required>
+                        <option value="" disabled selected>Choose Pickup Time</option>
+                        <option value="10:00 AM">10:00 AM</option>
+                        <option value="10:30 AM">10:30 AM</option>
+                        <option value="11:00 AM">11:00 AM</option>
+                        <option value="12:00 PM">12:00 PM</option>
+                        <option value="12:30 PM">12:30 PM</option>
+                        <option value="1:00 PM">1:00 PM</option>
+                        <option value="1:30 PM">1:30 PM</option>
+                        <option value="2:00 PM">2:00 PM</option>
+                        <option value="3:00 PM">3:00 PM</option>
+                        <option value="4:00 PM">4:00 PM</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down select-arrow"></i>
+                </div>
+                <p class="checkout-notice"><i class="fa-solid fa-triangle-exclamation"></i> Orders can only be cancelled while status is "Pending".</p>
+            </div>
+
+            <button class="btn btn-primary btn-block checkout-btn" id="place-order-btn">Place Pre-Order <i class="fa-solid fa-circle-arrow-right"></i></button>
+        </div>
+    </aside>
+
+    <!-- Modals Layer -->
+    
+    <!-- 1. Authentication Modal (Login & Registration) -->
+    <div class="modal-overlay" id="auth-modal">
+        <div class="modal-card">
+            <button class="modal-close" id="auth-modal-close" aria-label="Close Modal"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="modal-tabs">
+                <button class="modal-tab-btn active" id="auth-tab-login" onclick="switchAuthTab('login')">Login</button>
+                <button class="modal-tab-btn" id="auth-tab-register" onclick="switchAuthTab('register')">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="modal-form active">
+                <h3 class="form-title">Welcome Back</h3>
+                <p class="form-desc">Login to place your canteen orders instantly.</p>
+
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-regular fa-envelope input-icon"></i>
+                        <input type="email" id="login-email" required placeholder="name@college.edu">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" id="login-password" required placeholder="••••••••">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-loading-handler">Login <i class="fa-solid fa-arrow-right-to-bracket"></i></button>
+            </form>
+
+            <!-- Registration Form -->
+            <form id="register-form" class="modal-form">
+                <h3 class="form-title">Create Account</h3>
+                <p class="form-desc">Sign up to pre-order food and bypass canteen lines.</p>
+
+                <div class="form-group">
+                    <label for="register-name">Full Name</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-regular fa-user input-icon"></i>
+                        <input type="text" id="register-name" required placeholder="Amit Kumar">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="register-email">Email Address</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-regular fa-envelope input-icon"></i>
+                        <input type="email" id="register-email" required placeholder="amit@college.edu">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" id="register-password" required minlength="6" placeholder="At least 6 characters">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="register-studentid">Student / Employee ID</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-regular fa-id-card input-icon"></i>
+                        <input type="text" id="register-studentid" required placeholder="CSE2023055">
+                    </div>
+                </div>
+
+                <!-- Admin secret credentials option -->
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="register-isadmin">
+                        <span class="checkmark"></span>
+                        Register as Canteen Staff / Admin
+                    </label>
+                </div>
+
+                <!-- Hidden admin passcode field -->
+                <div class="form-group hidden" id="admin-code-group">
+                    <label for="register-admincode" class="text-orange"><i class="fa-solid fa-key"></i> Staff Verification Code</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-solid fa-shield-halved input-icon"></i>
+                        <input type="password" id="register-admincode" placeholder="Enter secret staff passcode">
+                    </div>
+                    <span class="input-help">Use code <strong>admin123</strong> for testing/viva demonstration.</span>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-loading-handler">Create Account <i class="fa-solid fa-user-plus"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. Food Item Form Modal (Add / Edit) -->
+    <div class="modal-overlay" id="food-modal">
+        <div class="modal-card">
+            <button class="modal-close" id="food-modal-close" aria-label="Close Modal"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="form-title" id="food-modal-title">Add New Food Item</h3>
+            <p class="form-desc">Add delicious snacks or meals to the cloud database.</p>
+
+            <form id="food-form" class="modal-form active">
+                <input type="hidden" id="food-id-field">
+
+                <div class="form-group">
+                    <label for="food-name">Food Name</label>
+                    <input type="text" id="food-name" required placeholder="e.g. Veg Burger, Masala Dosa">
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="food-category">Category</label>
+                        <div class="select-wrapper">
+                            <select id="food-category" required>
+                                <option value="" disabled selected>Select Category</option>
+                                <option value="Breakfast">Breakfast</option>
+                                <option value="Meals">Meals</option>
+                                <option value="Snacks">Snacks</option>
+                                <option value="Beverages">Beverages</option>
+                                <option value="Desserts">Desserts</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down select-arrow"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="food-price">Price (₹)</label>
+                        <input type="number" id="food-price" required min="1" placeholder="60">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="food-desc">Description</label>
+                    <textarea id="food-desc" rows="2" placeholder="Crunchy vegetable patty with cheese, tomato and onions..." required></textarea>
+                </div>
+
+                <!-- Food Image Selection -->
+                <div class="form-group">
+                    <label>Food Image Source</label>
+                    <div class="image-source-toggle">
+                        <button type="button" class="img-toggle-btn active" id="toggle-url-source" onclick="setImageSource('url')"><i class="fa-solid fa-link"></i> Image URL</button>
+                        <button type="button" class="img-toggle-btn" id="toggle-file-source" onclick="setImageSource('file')"><i class="fa-solid fa-cloud-arrow-up"></i> Upload File</button>
+                    </div>
+                </div>
+
+                <!-- URL Image Input -->
+                <div class="form-group" id="image-url-group">
+                    <label for="food-imageurl">Image URL</label>
+                    <input type="url" id="food-imageurl" placeholder="https://images.unsplash.com/photo-...">
+                    <span class="input-help">Provide a public direct link. You can leave empty for a category placeholder.</span>
+                </div>
+
+                <!-- File Upload Image Input -->
+                <div class="form-group hidden" id="image-file-group">
+                    <label for="food-imagefile">Upload Image File (Firebase Storage)</label>
+                    <div class="file-dropzone">
+                        <i class="fa-solid fa-image dropzone-icon"></i>
+                        <span id="file-label">Choose file or drag here</span>
+                        <input type="file" id="food-imagefile" accept="image/*">
+                    </div>
+                    <span class="input-help">Ensure Firebase Storage rules are set to public read/write.</span>
+                </div>
+
+                <!-- Availability Checkbox -->
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="food-available" checked>
+                        <span class="checkmark"></span>
+                        Mark as Available for Order
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-loading-handler" id="food-form-submit-btn">Save Food Item <i class="fa-solid fa-cloud-arrow-up"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. Confirmation Dialog Modal -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-card modal-small text-center">
+            <div class="confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3 class="form-title" id="confirm-title">Are you sure?</h3>
+            <p class="form-desc" id="confirm-description">This action cannot be undone.</p>
+            
+            <div class="confirm-buttons">
+                <button class="btn btn-outline" id="confirm-cancel-btn">Cancel</button>
+                <button class="btn btn-danger" id="confirm-approve-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple Page Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Cloud-Based Canteen Pre-Order System. Cloud Computing Mini-Project.</p>
+        <div class="footer-badges">
+            <span class="footer-badge"><i class="fa-solid fa-cloud"></i> Firebase Cloud</span>
+            <span class="footer-badge"><i class="fa-solid fa-shield-halved"></i> Firestore Secure</span>
+            <span class="footer-badge"><i class="fa-brands fa-js"></i> Vanilla JS</span>
+        </div>
+    </footer>
+
+</body>
+</html>
